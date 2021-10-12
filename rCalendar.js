@@ -10,18 +10,20 @@
     let click_count;
     let start_date;
     let end_date;
-    const div = $('#div_date');
+    const div = $('#flights');
+    const startId = 'dep-1';
+    const endId = 'dep-2';
     const startInput = $('#dep-1');
     const endInput = $('#dep-2');
-    $('#div_date').on("focus", ".input_date", function(e) {
+    div.on("focus", ".input_date", function(e) {
         renderRangeCalendar(div);
         showCalendar(e, startInput, endInput);
     });
 
-    $('div').on("mouseover", ".each_day", function(e) {
-        start_date = $('#dep-1').val();
-        end_date = $('#dep-2').val();
-        if (click_id == 'dep-1') {
+    div.on("mouseover", ".each_day", function(e) {
+        start_date = startInput.val();
+        end_date = endInput.val();
+        if (click_id == startId) {
             let hover_id = e.target.id;
             hover_date = formatIdToDate(hover_id, 0)
             if (start_date !== '' && end_date !== '') {
@@ -39,7 +41,7 @@
                 }
             }
         }
-        if (click_id == 'dep-2') {
+        if (click_id == endId) {
             let hover_id = e.target.id;
             hover_date = formatIdToDate(hover_id, 0);
             if (start_date !== '' && end_date !== '') {
@@ -64,19 +66,19 @@
             }
         }
     });
-    $('div').on("click", ".each_day", function(e) {
+    div.on("click", ".each_day", function(e) {
         let click_day_id = e.target.id;
         click_date = formatIdToDate(click_day_id, 0)
-        start_date = $('#dep-1').val();
-        end_date = $('#dep-2').val();
-        if (click_id == 'dep-1') {
+        start_date = startInput.val();
+        end_date = endInput.val();
+        if (click_id == startId) {
             if (start_date == '' && end_date == '') {
                 if (click_count == 0) {
-                    $('#dep-1').val(click_day_id);
+                    startInput.val(click_day_id);
                     $('#' + click_day_id).addClass('selected_day');
                     dep_2 = formatIdToDate(click_day_id, 1);
                     dep_2 = formatDateToID(dep_2);
-                    $('#dep-2').val(dep_2);
+                    endInput.val(dep_2);
                     click_count = 1;
                 };
             }
@@ -85,25 +87,25 @@
                 end_date = formatIdToDate(end_date, 0);
                 if (click_count == 1) {
                     if (click_date < start_date) {
-                        $('#dep-1').val(click_day_id);
+                        startInput.val(click_day_id);
                         $('.each_day').removeClass('selected_day');
                         $('#' + click_day_id).addClass('selected_day');
                     }
                     if (click_date > start_date || click_date.getTime() == start_date.getTime()) {
-                        $('#dep-2').val(click_day_id);
+                        endInput.val(click_day_id);
                         $('#' + click_day_id).addClass('selected_day');
                         $('#calendar').css("display", "none");
                     }
                 }
                 if (click_count == 0) {
                     if (click_date < end_date || click_date.getTime() == end_date.getTime()) {
-                        $('#dep-1').val(click_day_id);
+                        startInput.val(click_day_id);
                         $('.selected_day:first').removeClass('selected_day');
                         $('#' + click_day_id).addClass('selected_day');
                         click_count = 1;
                     }
                     if (click_date > end_date) {
-                        $('#dep-1').val(click_day_id);
+                        startInput.val(click_day_id);
                         $('.each_day').removeClass('range_hover');
                         $('.selected_day').removeClass('selected_day');
                         $('#' + click_day_id).addClass('selected_day');
@@ -112,40 +114,40 @@
                 }
             }
         }
-        if (click_id == 'dep-2') {
+        if (click_id == endId) {
             if (start_date == '' && end_date == '' && click_count == 0) {
-                $('#dep-1').val(click_day_id);
+                startInput.val(click_day_id);
                 $('#' + click_day_id).addClass('selected_day');
                 dep_2 = formatIdToDate(click_day_id, 1);
                 dep_2 = formatDateToID(dep_2);
-                $('#dep-2').val(dep_2);
+                endInput.val(dep_2);
                 $('#' + dep_2).addClass('selected_day');
                 click_count = 1;
             }
             if (start_date !== '' && end_date !== '') {
-                start_date = formatIdToDate($('#dep-1').val(), 0);
+                start_date = formatIdToDate(startInput.val(), 0);
                 if (click_count == 1) {
                     if (click_date < start_date) {
-                        $('#dep-1').val(click_day_id);
+                        startInput.val(click_day_id);
                         $('.selected_day:first').removeClass('selected_day');
                         $('#' + click_day_id).addClass('selected_day');
                         // click_count = 0;
                     }
                     if (click_date > start_date || click_date.getTime() == start_date.getTime()) {
-                        $('#dep-2').val(click_day_id);
+                        endInput.val(click_day_id);
                         $('#' + click_day_id).addClass('selected_day');
                         $('#calendar').css("display", "none");
                     }
                 }
                 if (click_count == 0) {
                     if (click_date < start_date || click_date.getTime() == start_date.getTime()) {
-                        $('#dep-1').val(click_day_id);
+                        startInput.val(click_day_id);
                         $('.selected_day:first').removeClass('selected_day');
                         $('#' + click_day_id).addClass('selected_day');
                         click_count = 1;
                     }
                     if (click_date > start_date) {
-                        $('#dep-2').val(click_day_id);
+                        endInput.val(click_day_id);
                         $('#' + click_day_id).addClass('selected_day');
                         $('#calendar').css("display", "none");
                     }
