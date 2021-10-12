@@ -1,11 +1,215 @@
-$(document).ready(function() {
+﻿$(document).ready(function() {
     const new_day = new Date();
     const today = new Date(new_day.getFullYear(), new_day.getMonth(), new_day.getDate());
     const today_month = today.getMonth();
     const today_year = today.getFullYear();
-
     const month_name = ['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư', 'Tháng Năm', 'Tháng Sáu', 'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai']
     const month_day = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    let click_id;
+    let click_count;
+    let start_date;
+    let end_date;
+    const div = $('#div_date');
+    const startInput = $('#dep-1');
+    const endInput = $('#dep-2');
+    $('#div_date').on("focus", ".input_date", function(e) {
+        renderRangeCalendar(div);
+        showCalendar(e, startInput, endInput);
+    });
+
+    $('div').on("mouseover", ".each_day", function(e) {
+        start_date = $('#dep-1').val();
+        end_date = $('#dep-2').val();
+        if (click_id == 'dep-1') {
+            let hover_id = e.target.id;
+            hover_date = formatIdToDate(hover_id, 0)
+            if (start_date !== '' && end_date !== '') {
+                start_date = formatIdToDate(start_date, 0);
+                end_date = formatIdToDate(end_date, 0);
+                if (click_count == 0) {
+                    if (hover_date < end_date || hover_date.getTime() == end_date.getTime()) {
+                        showRange(hover_date, end_date);
+                    }
+                }
+                if (click_count == 1) {
+                    if (hover_date > start_date || hover_date.getTime() == start_date.getTime()) {
+                        showRange(start_date, hover_date);
+                    }
+                }
+            }
+        }
+        if (click_id == 'dep-2') {
+            let hover_id = e.target.id;
+            hover_date = formatIdToDate(hover_id, 0);
+            if (start_date !== '' && end_date !== '') {
+                start_date = formatIdToDate(start_date, 0);
+                end_date = formatIdToDate(end_date, 0);
+                if (click_count == 1) {
+                    if (hover_date < start_date) {
+                        showRange(hover_date, end_date);
+                    }
+                    if (hover_date > start_date || hover_date.getTime() == start_date.getTime()) {
+                        showRange(start_date, hover_date);
+                    }
+                }
+                if (click_count == 0) {
+                    if (hover_date < start_date) {
+                        showRange(hover_date, end_date);
+                    }
+                    if (hover_date > start_date || hover_date.getTime() == start_date.getTime()) {
+                        showRange(start_date, hover_date);
+                    }
+                }
+            }
+        }
+    });
+    $('div').on("click", ".each_day", function(e) {
+        let click_day_id = e.target.id;
+        click_date = formatIdToDate(click_day_id, 0)
+        start_date = $('#dep-1').val();
+        end_date = $('#dep-2').val();
+        if (click_id == 'dep-1') {
+            if (start_date == '' && end_date == '') {
+                if (click_count == 0) {
+                    $('#dep-1').val(click_day_id);
+                    $('#' + click_day_id).addClass('selected_day');
+                    dep_2 = formatIdToDate(click_day_id, 1);
+                    dep_2 = formatDateToID(dep_2);
+                    $('#dep-2').val(dep_2);
+                    click_count = 1;
+                };
+            }
+            if (start_date !== '' && end_date !== '') {
+                start_date = formatIdToDate(start_date, 0);
+                end_date = formatIdToDate(end_date, 0);
+                if (click_count == 1) {
+                    if (click_date < start_date) {
+                        $('#dep-1').val(click_day_id);
+                        $('.each_day').removeClass('selected_day');
+                        $('#' + click_day_id).addClass('selected_day');
+                    }
+                    if (click_date > start_date || click_date.getTime() == start_date.getTime()) {
+                        $('#dep-2').val(click_day_id);
+                        $('#' + click_day_id).addClass('selected_day');
+                        $('#calendar').css("display", "none");
+                    }
+                }
+                if (click_count == 0) {
+                    if (click_date < end_date || click_date.getTime() == end_date.getTime()) {
+                        $('#dep-1').val(click_day_id);
+                        $('.selected_day:first').removeClass('selected_day');
+                        $('#' + click_day_id).addClass('selected_day');
+                        click_count = 1;
+                    }
+                    if (click_date > end_date) {
+                        $('#dep-1').val(click_day_id);
+                        $('.each_day').removeClass('range_hover');
+                        $('.selected_day').removeClass('selected_day');
+                        $('#' + click_day_id).addClass('selected_day');
+                        click_count = 1;
+                    }
+                }
+            }
+        }
+        if (click_id == 'dep-2') {
+            if (start_date == '' && end_date == '' && click_count == 0) {
+                $('#dep-1').val(click_day_id);
+                $('#' + click_day_id).addClass('selected_day');
+                dep_2 = formatIdToDate(click_day_id, 1);
+                dep_2 = formatDateToID(dep_2);
+                $('#dep-2').val(dep_2);
+                $('#' + dep_2).addClass('selected_day');
+                click_count = 1;
+            }
+            if (start_date !== '' && end_date !== '') {
+                start_date = formatIdToDate($('#dep-1').val(), 0);
+                if (click_count == 1) {
+                    if (click_date < start_date) {
+                        $('#dep-1').val(click_day_id);
+                        $('.selected_day:first').removeClass('selected_day');
+                        $('#' + click_day_id).addClass('selected_day');
+                        // click_count = 0;
+                    }
+                    if (click_date > start_date || click_date.getTime() == start_date.getTime()) {
+                        $('#dep-2').val(click_day_id);
+                        $('#' + click_day_id).addClass('selected_day');
+                        $('#calendar').css("display", "none");
+                    }
+                }
+                if (click_count == 0) {
+                    if (click_date < start_date || click_date.getTime() == start_date.getTime()) {
+                        $('#dep-1').val(click_day_id);
+                        $('.selected_day:first').removeClass('selected_day');
+                        $('#' + click_day_id).addClass('selected_day');
+                        click_count = 1;
+                    }
+                    if (click_date > start_date) {
+                        $('#dep-2').val(click_day_id);
+                        $('#' + click_day_id).addClass('selected_day');
+                        $('#calendar').css("display", "none");
+                    }
+                }
+            }
+        }
+    });
+    $('div').on("click", ".change_month", function(e) {
+        let click_id = e.target.id;
+        let current_month = $('#header_month').text();
+        let current_year = $('#header_year').text();
+        let next_month = $('#next_month_header').text();
+        let next_year = $('#next_year_header').text();
+        let mm_index = month_name.findIndex(function(month) {
+            return month == current_month;
+        })
+        let mm = 0
+        if (mm_index == -1) {
+            mm = today_month;
+        } else {
+            mm = mm_index
+        }
+        let next_mm = mm + 1;
+        let yyyy = parseInt(current_year);
+        let next_yyyy = parseInt(next_year);
+        if (click_id == 'next') {
+            if (mm == 11) {
+                mm = 0;
+                yyyy += 1;
+            } else {
+                mm += 1
+            }
+            if (next_mm == 11) {
+                next_mm = 0
+                next_yyyy += 1;
+            } else {
+                next_mm += 1;
+            }
+        }
+        if (click_id == 'prev') {
+            if (mm == 0) {
+                mm = 11;
+                yyyy -= 1;
+            } else {
+                mm -= 1;
+            }
+            if (next_mm == 0) {
+                next_mm = 11;
+                next_yyyy -= 1;
+            } else {
+                next_mm -= 1;
+            }
+        }
+        $('#header_month').text(month_name[mm]);
+        $('#header_year').text(yyyy);
+        $('#next_month_header').text(month_name[next_mm]);
+        $('#next_year_header').text(next_yyyy);
+        my_calendar(mm, yyyy);
+    });
+    $(document).click(function(e) {
+        if (!$(e.target).closest(".calendar, .input_date").length) {
+            $('#calendar').css("display", "none");
+        }
+    })
 
     function day_of_feb(year) {
         if ((year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 === 0)) {
@@ -98,198 +302,6 @@ $(document).ready(function() {
         }
     }
 
-    $('#div_date').on("focus", ".input_date", function(e) {
-        let click_id = e.target.id;
-        let mm = today_month;
-        let yyyy = today_year;
-        $('#calendar').attr("value", click_id);
-        $('#calendar').css("display", "flex");
-        my_calendar(mm, yyyy);
-        let click_count;
-        let start_date_id;
-        let start_date;
-        let end_date;
-
-        if ($('#dep-1').val() !== '' && end_date !== '') {
-            start_date = formatIdToDate($('#dep-1').val(), 0);
-            let end_date = formatIdToDate($('#dep-2').val(), 0);
-            hover_range = getDatesRange(start_date, end_date);
-            hover_range = formatDates(hover_range);
-            let range_id = hoverOverMonth(hover_range);
-            range_id = unique(range_id);
-            range_id.forEach(function(h) {
-                $('#' + h).addClass('range_hover');
-            });
-            $('#' + $('#dep-1').val()).addClass('selected_day');
-            $('#' + $('#dep-2').val()).addClass('selected_day');
-        }
-
-        $("#calendar").on("mouseover", ".each_day", function(e) {
-            // Tại sao click_count có cùng lúc 2 giá trị 1 & 0 ?????
-            console.log(click_count);
-            if (click_count == undefined) {
-                click_count = 0
-            }
-            let hover_id = e.target.id;
-            if (click_id == 'dep-1') {
-                if (!$('.each_day').hasClass('selected_day') && click_count == 0) {
-                    $('#dep-1').val(hover_id);
-                }
-                if ($('.each_day').hasClass('selected_day') && click_count == 0) {
-                    let end_date = formatIdToDate($('#dep-2').val(), 0);
-                    hover_date = formatIdToDate(hover_id, 0);
-                    if (hover_date < end_date || hover_date.getTime() == end_date.getTime()) {
-                        $('#dep-1').val(hover_id);
-                        hover_range = getDatesRange(hover_date, end_date);
-                        hover_range = formatDates(hover_range);
-                        let range_id = hoverOverMonth(hover_range);
-                        range_id = unique(range_id);
-                        $('.each_day').removeClass('range_hover');
-                        range_id.forEach(function(h) {
-                            $('#' + h).addClass('range_hover');
-                        });
-                    }
-                    if (hover_date > end_date) {
-                        $('#dep-1').val(hover_id);
-                    }
-                }
-                if ($('.each_day').hasClass('selected_day') && click_count == 1) {
-                    hover_date = formatIdToDate(hover_id, 0)
-                    start_date = formatIdToDate(start_date_id, 0);
-                    if (hover_date < start_date) {
-                        $('#dep-1').val(hover_id);
-                    }
-                    if (hover_date > start_date || hover_date.getTime() == start_date.getTime()) {
-                        $('#dep-1').val(start_date_id);
-                        $('#dep-2').val(hover_id);
-                        hover_range = getDatesRange(start_date, hover_date);
-                        hover_range = formatDates(hover_range);
-                        let range_id = hoverOverMonth(hover_range);
-                        range_id = unique(range_id);
-                        $('.each_day').removeClass('range_hover');
-                        range_id.forEach(function(h) {
-                            $('#' + h).addClass('range_hover');
-                        });
-                    }
-                }
-            }
-            if (click_id == 'dep-2') {
-                $('#dep-2').val(hover_id);
-            }
-        });
-
-        $('.calendar_days').on("click", ".each_day", function(e) {
-            if (!$('.each_day').hasClass('selected_day') && click_count == 0) {
-                let click_day_id = e.target.id;
-                $('#dep-1').val(click_day_id);
-                $('#' + click_day_id).addClass('selected_day');
-                dep_2 = formatIdToDate(click_day_id, 2);
-                dep_2 = formatDateToID(dep_2);
-                $('#dep-2').val(dep_2);
-                click_count = 1;
-                start_date_id = click_day_id;
-            }
-            if ($('.each_day').hasClass('selected_day') && click_count == 1) {
-                let click_day_id = e.target.id;
-                click_date = formatIdToDate(click_day_id, 0)
-                start_date = formatIdToDate(start_date_id, 0);
-                if (click_date < start_date) {
-                    $('#dep-1').val(click_day_id);
-                    $('.each_day').removeClass('selected_day');
-                    $('#' + click_day_id).addClass('selected_day');
-                    start_date_id = click_day_id;
-                }
-                // Lỗi khi đặt thêm TH bằng: click_date.getTime() == start_date.getTime()
-                if (click_date > start_date) {
-                    $('#dep-2').val(click_day_id);
-                    $('#' + click_day_id).addClass('selected_day');
-                    $('#calendar').css("display", "none");
-                    click_count = 0;
-                }
-            }
-            if ($('.each_day').hasClass('selected_day') && click_count == 0) {
-                let end_date = formatIdToDate($('#dep-2').val(), 0);
-                let click_day_id = e.target.id;
-                click_date = formatIdToDate(click_day_id, 0)
-                    // Lỗi khi đặt thêm TH bằng: click_date.getTime() == start_date.getTime()
-                if (click_date < end_date) {
-                    $('#dep-1').val(click_day_id);
-                    $('.selected_day:first').removeClass('selected_day');
-                    $('#' + click_day_id).addClass('selected_day');
-                }
-                if (click_date > end_date) {
-                    $('#dep-1').val(click_day_id);
-                    $('.each_day').removeClass('range_hover');
-                    $('.selected_day').removeClass('selected_day');
-                    $('#' + click_day_id).addClass('selected_day');
-                    end_date = $('#dep-2').val('');
-                    start_date_id = click_day_id;
-                    console.log(start_date_id);
-                    return click_count = 1;
-                }
-            }
-        })
-    });
-
-    $('.calendar_header').on("click", ".change_month", function(e) {
-        let click_id = e.target.id;
-        let current_month = $('#header_month').text();
-        let current_year = $('#header_year').text();
-        let next_month = $('#next_month_header').text();
-        let next_year = $('#next_year_header').text();
-        let mm_index = month_name.findIndex(function(month) {
-            return month == current_month;
-        })
-        let mm = 0
-        if (mm_index == -1) {
-            mm = today_month;
-        } else {
-            mm = mm_index
-        }
-        let next_mm = mm + 1;
-        let yyyy = parseInt(current_year);
-        let next_yyyy = parseInt(next_year);
-        if (click_id == 'next') {
-            if (mm == 11) {
-                mm = 0;
-                yyyy += 1;
-            } else {
-                mm += 1
-            }
-            if (next_mm == 11) {
-                next_mm = 0
-                next_yyyy += 1;
-            } else {
-                next_mm += 1;
-            }
-        }
-        if (click_id == 'prev') {
-            if (mm == 0) {
-                mm = 11;
-                yyyy -= 1;
-            } else {
-                mm -= 1;
-            }
-            if (next_mm == 0) {
-                next_mm = 11;
-                next_yyyy -= 1;
-            } else {
-                next_mm -= 1;
-            }
-        }
-        $('#header_month').text(month_name[mm]);
-        $('#header_year').text(yyyy);
-        $('#next_month_header').text(month_name[next_mm]);
-        $('#next_year_header').text(next_yyyy);
-        my_calendar(mm, yyyy);
-    });
-
-    $(document).click(function(e) {
-        if (!$(e.target).closest(".calendar, .input_date").length) {
-            $('#calendar').css("display", "none");
-        }
-    })
-
     function formatIdToDate(date, n) {
         let dd = parseInt(date.split('-')[0]);
         let mm = parseInt(date.split('-')[1]);
@@ -314,64 +326,94 @@ $(document).ready(function() {
         return dd + '-' + mm + '-' + yyyy;
     };
 
-    function getDatesRange(startDate, endDate) {
-        var dates = [],
-            currentDate = startDate,
-            addDays = function(days) {
+    function showRange(startDate, endDate) {
+        let a = document.getElementsByClassName("each_day")
+        for (i in a) {
+            if (a[i].id != undefined) {
+                let moveDay = parseInt(a[i].id.split("-")[0])
+                let moveMonth = parseInt(a[i].id.split("-")[1] - 1)
+                let moveYear = parseInt(a[i].id.split("-")[2])
+                let moveDate = new Date(moveYear, moveMonth, moveDay)
+                if (moveDate > startDate && moveDate < endDate) {
+                    $("#" + a[i].id).addClass("range_hover");
+                } else {
+                    $("#" + a[i].id).removeClass("range_hover");
 
-                var date = new Date(this.valueOf());
-                date.setDate(date.getDate() + days);
-                return date;
-            };
-        while (currentDate <= endDate) {
-            dates.push(currentDate);
-            currentDate = addDays.call(currentDate, 1);
-        }
-        return dates;
-    }
-
-    function formatDates(dates) {
-        let newDateArray = [];
-        for (let i = 0; i < dates.length; i++) {
-            let date = "";
-            if ((dates[i].getDate()) < 10) {
-                date += '0' + dates[i].getDate() + "-";
-            } else {
-                date += dates[i].getDate() + "-";
+                }
             }
-            if (((dates[i].getMonth()) + 1) < 10) {
-                date += '0' + (dates[i].getMonth() + 1) + "-";
-            } else {
-                date += (dates[i].getMonth() + 1) + "-";
-            }
-            date += dates[i].getFullYear();
-            newDateArray.push(date);
+
         }
-        return newDateArray;
+
+    };
+
+    function renderRangeCalendar(div) {
+        const calendar = `<div id="calendar" class="calendar" value="">
+            <div id="curr_month">
+                <div class="calendar_header">
+                    <span id="prev" class="change_month">&lt;</span>
+                    <span id="header_month">mm</span>
+                    <span id="header_year">yyyy</span>
+    
+                </div>
+                <div class="calendar_body">
+                    <div class="calendar_week_day">
+                        <div>CN</div>
+                        <div>T2</div>
+                        <div>T3</div>
+                        <div>T4</div>
+                        <div>T5</div>
+                        <div>T6</div>
+                        <div>T7</div>
+                    </div>
+                    <div id="calendar_day" class="calendar_days"></div>
+                </div>
+            </div>
+            <div id="cont_month">
+                <div class="calendar_header">
+                    <!-- <span id="cont_prev" class="change_month">&lt;</span> -->
+                    <span id="next_month_header">mm</span>
+                    <span id="next_year_header">yyyy</span>
+                    <span id="next" class="change_month">&gt;</span>
+                    <!-- <span id="cont_next" class="change_month">&gt;</span> -->
+                </div>
+                <div class="calendar_body">
+                    <div class="calendar_week_day">
+                        <div>CN</div>
+                        <div>T2</div>
+                        <div>T3</div>
+                        <div>T4</div>
+                        <div>T5</div>
+                        <div>T6</div>
+                        <div>T7</div>
+                    </div>
+                    <div id="next_month_calendar_day" class="calendar_days"></div>
+                </div>
+            </div>
+        </div>`
+        $('#calendar').remove();
+        div.append(calendar);
     }
 
-    function hoverOverMonth(array) {
-        let hover_array = array
-        let check_id = document.getElementsByClassName('each_day');
-        let range_id = [];
-        for (let i = 0; i < check_id.length; i++) {
-            range_id.push($('.each_day')[i].id);
+    function showCalendar(e, startInput, endInput) {
+        click_id = e.target.id;
+        click_count = 0;
+        $('#calendar').attr("value", click_id);
+        $('#calendar').css("display", "flex");
+        if (startInput.val() !== '' && endInput.val() !== '') {
+            let start_date = startInput.val();
+            let end_date = endInput.val()
+            let mm = parseInt(start_date.split("-")[1] - 1)
+            let yyyy = parseInt(start_date.split("-")[2])
+            my_calendar(mm, yyyy);
+            start_date = formatIdToDate(start_date, 0);
+            end_date = formatIdToDate(end_date, 0);
+            showRange(start_date, end_date);
+            $('#' + startInput.val()).addClass('selected_day');
+            $('#' + endInput.val()).addClass('selected_day');
+        } else {
+            let mm = today_month;
+            let yyyy = today_year;
+            my_calendar(mm, yyyy);
         }
-        for (let j = 0; j < hover_array.length; j++) {
-            range_id.push(hover_array[j]);
-        }
-        return range_id;
     }
-
-    function unique(arr) {
-        var formArr = arr.sort()
-        var newArr = [];
-        for (let i = 0; i < formArr.length; i++) {
-            if (formArr[i] == formArr[i - 1]) {
-                newArr.push(formArr[i])
-            }
-        }
-        return newArr
-    }
-
 });
