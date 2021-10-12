@@ -155,7 +155,7 @@
             }
         }
     });
-    $('div').on("click", ".change_month", function(e) {
+    div.on("click", ".change_month", function(e) {
         let click_id = e.target.id;
         let current_month = $('#header_month').text();
         let current_year = $('#header_year').text();
